@@ -1,3 +1,8 @@
+"""
+https://github.com/kivy/plyer/issues/500
+https://github.com/jefersonvinicius/nipe-project/blob/master/device/cameraandroid.py
+"""
+
 from android import activity
 from jnius import autoclass, cast
 
