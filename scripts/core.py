@@ -1,15 +1,12 @@
-from kivymd.toast.kivytoast.kivytoast import toast
-from kivy.network.urlrequest import UrlRequest
-
-from kivy.graphics import Color, RoundedRectangle
-from kivy.core.image import Image as CoreImage
-from kivy.uix.image import Image as UixImage
-
-from requests_toolbelt import MultipartEncoder
-from PIL import Image
+import imghdr
 import io
 import urllib.parse
-import imghdr
+
+from kivy.core.image import Image as CoreImage
+from kivy.graphics import Color, RoundedRectangle
+from kivy.network.urlrequest import UrlRequest
+from PIL import Image
+from requests_toolbelt import MultipartEncoder
 
 
 class PlantifyCore:

@@ -1,58 +1,34 @@
-from kivymd.app import MDApp
-from kivymd.theming import ThemableBehavior
-from kivymd.font_definitions import theme_font_styles
-import kivymd.material_resources as m_res
-
-from kivymd.toast.kivytoast.kivytoast import toast
-from kivymd.uix.snackbar import Snackbar
-
-from kivymd.uix.behaviors import (
-    RectangularRippleBehavior,
-    CircularRippleBehavior,
-    RectangularElevationBehavior,
-)
-from kivymd.uix.list import MDList, BaseListItem, ThreeLineListItem, OneLineListItem
-from kivymd.uix.button import MDIconButton, MDRoundFlatButton
-from kivymd.uix.taptargetview import MDTapTargetView
-from kivymd.uix.label import MDLabel
-from kivymd.uix.card import MDCard
+from datetime import datetime
 
 from kivy.clock import Clock
-from kivy.properties import (
-    ObjectProperty,
-    StringProperty,
-    OptionProperty,
-    ListProperty,
-    NumericProperty,
-    BooleanProperty,
-)
-from kivy.utils import platform
 from kivy.core.window import Window
 from kivy.graphics import (
     Color,
     Ellipse,
     RoundedRectangle,
-    StencilPush,
     StencilPop,
-    StencilUse,
+    StencilPush,
     StencilUnUse,
+    StencilUse,
 )
-
+from kivy.properties import ObjectProperty
 from kivy.uix.behaviors import ButtonBehavior
-from kivy.uix.screenmanager import ScreenManager, Screen, WipeTransition
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.relativelayout import RelativeLayout
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.screenmanager import Screen, ScreenManager, WipeTransition
+from kivy.utils import platform
+from kivymd.app import MDApp
+from kivymd.theming import ThemableBehavior
+from kivymd.toast.kivytoast.kivytoast import toast
+from kivymd.uix.behaviors import RectangularElevationBehavior, RectangularRippleBehavior
+from kivymd.uix.list import MDList
+from kivymd.uix.snackbar import Snackbar
+from kivymd.uix.taptargetview import MDTapTargetView
 
+from scripts.core import PlantifyCore
 from widgets.debugdialog import DebugDialog
-from scripts.core import PlantifyCore, ImageQuery
 
 if platform == "android":
     from scripts.camera_jvinicius import CameraAndroid
-
-from datetime import datetime
-from PIL import Image
-import io
 
 
 class Manager(ScreenManager):
@@ -86,11 +62,7 @@ class MainScreen(Screen):
         Clock.schedule_once(lambda *args: self.button_taptarget.stop(), 5)
 
     def runtime_permissions(self, *args):
-        from android.permissions import (
-            request_permission,
-            request_permissions,
-            Permission,
-        )
+        from android.permissions import Permission, request_permissions
 
         request_permissions(
             [

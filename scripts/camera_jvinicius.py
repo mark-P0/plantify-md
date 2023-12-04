@@ -1,7 +1,5 @@
+from android import activity
 from jnius import autoclass, cast
-from android import activity, mActivity
-import time
-import android
 
 PythonActivity = autoclass("org.kivy.android.PythonActivity")
 File = autoclass("java.io.File")
