@@ -1,0 +1,443 @@
+#: import Window kivy.core.window.Window
+#: import Clock kivy.clock.Clock
+#: import Animation kivy.animation.Animation
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
+#: import Image kivy.uix.image.Image
+#: import Widget kivy.uix.widget.Widget
+
+#: import toast kivymd.toast.kivytoast.kivytoast.toast
+#: import Snackbar kivymd.uix.snackbar.Snackbar
+
+#: import MDBoxLayout kivymd.uix.boxlayout.MDBoxLayout
+
+
+
+Manager:
+    MainScreen:
+        name: 'main'
+    
+    SubScreen:
+        name: 'sub'
+
+
+<MainScreen>:
+    camera_button: open_camera
+
+    canvas.before:
+        Color:
+            rgba: [1,1,1,1]
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'images/main_background.jpg'
+
+        # Black overlay
+        # Color:
+        #     rgba: [0, 0, 0, 0.25]
+        # Rectangle:
+        #     pos: self.pos
+        #     size: self.size
+        
+    
+    BoxLayout:
+        orientation: 'vertical'
+
+        Widget:
+            size_hint_y: 0.15
+
+        MDIcon:
+            size_hint_y: 0.1
+
+            icon: 'leaf'
+            halign: 'center'
+
+            theme_text_color: "Custom"
+            text_color: app.theme_cls.primary_color
+
+        MDLabel:
+            size_hint_y: 0.1
+            
+            text: 'Plantify'.upper()
+            halign: 'center'
+
+            font_style: 'H3'
+            bold: True
+            theme_text_color: "Custom"
+            text_color: app.theme_cls.opposite_text_color
+
+        MDLabel:
+            size_hint_y: 0.1
+            
+            text: 'Tap the Camera icon below to start!'
+            halign: 'center'
+            valign: 'top'
+
+            font_style: 'Subtitle2'
+            font_size: dp(12)
+            theme_text_color: "Custom"
+            text_color: app.theme_cls.opposite_text_color
+        
+        Widget:
+            size_hint_y: 0.85
+    
+    MDFloatingActionButton:
+        id: open_camera
+
+        # x: Window.width - (dp(56) + dp(20))
+        # y: dp(20)
+        x: (Window.width - self.width) // 2
+        y: (Window.height) // 2
+
+        icon: 'camera'
+        text_color: app.theme_cls.opposite_text_color
+        user_font_size: '50sp'
+
+        # md_bg_color: app.theme_cls.accent_color
+        # md_bg_color: app.theme_cls.primary_color
+        md_bg_color: [i if index != 3 else 0.5 for index, i in enumerate(app.theme_cls.primary_color)]
+        # md_bg_color: [0, 0, 0, 0]
+
+        on_release:
+            root.camera_prompt()
+
+
+<SubScreen>:
+    container_list: sub_listview
+    captured_image: sub_image
+    backdrop: backdrop.__self__
+    loader: loader.__self__
+    backdrop_button: custom_backdrop_button
+
+    on_enter:
+        loader.active = True
+
+    canvas.before:
+        Color:
+            rgba: [1,1,1,1]
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    MDBackdrop:
+        id: backdrop
+        header_text: 'Waiting for response. . .'
+
+        left_action_items: [['', lambda x: x]]
+        close_icon: ''
+
+        background_color: app.theme_cls.primary_light
+
+        on_open:
+            Animation(y=relatables.pos[1] - 30, duration=0.15).start(relatables)
+            # Animation(y=sub_image.pos[1] - 30, duration=0.15).start(sub_image)
+
+            # if not root.from_peek: Animation(phint_y=loader.phint_y * -0.5, duration=0.15).start(loader)
+            # if not root.from_peek: Animation(y=bottom_right_button.y * -2, duration=0.15).start(bottom_right_button)
+
+            Animation(phint_y=loader.phint_y * -0.5, duration=0.15).start(loader)
+            Animation(y=bottom_right_button.y * -2, duration=0.15).start(bottom_right_button)
+
+            custom_backdrop_button.icon = 'chevron-up'
+                    
+        on_close:
+            Animation(y=relatables.pos[1] + 30, duration=0.15).start(relatables)
+            # Animation(y=sub_image.pos[1] + 30, duration=0.15).start(sub_image)
+
+            # if not root.from_peek: Animation(phint_y=loader.phint_y / -0.5, duration=0.15).start(loader)
+            # if not root.from_peek: Animation(y=bottom_right_button.y / -2, duration=0.2).start(bottom_right_button)
+
+            Animation(phint_y=loader.phint_y / -0.5, duration=0.15).start(loader)
+            Animation(y=bottom_right_button.y / -2, duration=0.2).start(bottom_right_button)
+
+            custom_backdrop_button.icon = 'chevron-down'
+
+
+        MDBackdropBackLayer:
+            RelativeLayout:
+                id: relatables
+
+                Image:
+                    id: sub_image
+                    size_hint: None, None
+
+                # MDIconButton:
+                #     icon: 'language-python'
+                #     pos_hint: {'x': 0.5, 'y': 0.5}
+                #     on_press:
+                #         print(relatables.y)
+
+                BackdropBackBox:
+                    id: backdrop_box
+                    y: sub_image.y - self.height - 20
+
+        MDBackdropFrontLayer:
+            RecycleView:
+                SubList:
+                    id: sub_listview
+
+
+    MDIconButton:
+        id: custom_backdrop_button
+        x: dp(10)
+        y: Window.height - (self.height + dp(8))
+
+        icon: 'chevron-down'
+        theme_text_color: 'Custom'
+        text_color: app.theme_cls.opposite_text_color
+                
+        on_release:
+            if backdrop._front_layer_open: backdrop.close()
+            else: backdrop.open()
+            
+    MDFloatingActionButton:
+        id: bottom_right_button
+
+        x: Window.width - (self.width + dp(25))
+        y: dp(35)
+
+        # icon: 'home-variant'
+        icon: 'camera'
+        user_font_size: '25sp'
+
+        theme_text_color: 'Custom'
+        text_color: app.theme_cls.opposite_text_color
+
+        md_bg_color: [i if index != 3 else 0.75 for index, i in enumerate(app.theme_cls.accent_color)]
+        
+        on_release:
+            app.root.get_screen('main').camera_prompt()
+
+            # root.manager.transition = FadeTransition()
+            # root.manager.current = 'main'
+
+            Clock.schedule_once(root.reset_list, 0.1)
+
+    MDSpinner:
+        id: loader
+        size_hint: None, None
+        size: dp(46), dp(46)
+        color: app.theme_cls.accent_color
+        active: False
+
+        phint_y: 0.5
+        pos_hint: {'center_x': 0.5, 'center_y': self.phint_y}
+
+
+<BackdropBackBox@MDBoxLayout>
+    orientation: 'vertical'
+    adaptive_height: True
+    padding: '15dp'
+    spacing: '10dp'
+
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        adaptive_height: True
+        padding: [5, 0, 0, 0]
+        spacing: '10dp'
+
+        MDLabel:
+            size_hint_y: None
+            height: self.texture_size[1]
+
+            text: 'Plant type'
+            bold: True
+        MDBoxLayout:
+            adaptive_height: True
+            size_hint_x: 0.8
+            padding: [0, 10, 0, 10]
+
+            MDCheckbox:
+                group: "plant-type"
+                allow_no_selection: False
+
+                size_hint_x: None                
+                size: "48dp", '48dp'
+                active: True
+
+                selected_color: app.theme_cls.accent_color
+                unselected_color: app.theme_cls.primary_color
+
+                on_active:
+                    if self.active: app.root.get_screen('sub').change_plant_type('flower')
+
+            MDLabel:
+                size_hint_y: None
+                height: self.texture_size[1]
+
+                text: "Flower"
+
+            MDCheckbox:
+                group: "plant-type"
+                allow_no_selection: False
+
+                size_hint_x: None                
+                size: "48dp", '48dp'
+
+                selected_color: app.theme_cls.accent_color
+                unselected_color: app.theme_cls.primary_color
+
+                on_active:
+                    if self.active: app.root.get_screen('sub').change_plant_type('leaf')
+
+            MDLabel:
+                size_hint_y: None
+                height: self.texture_size[1]
+
+                text: "Leaf"
+
+    MDSeparator:
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        adaptive_height: True
+        padding: [5, 0, 0, 0]
+        spacing: '10dp'
+
+        MDLabel:
+            size_hint_y: None
+            height: self.texture_size[1]
+
+            text: 'About us'
+            bold: True
+        OneLineIconListItem:
+            divider: None
+
+            text: 'Developers'
+
+            IconLeftWidget:
+                theme_text_color: 'Custom'
+                text_color: app.theme_cls.primary_dark
+
+                icon: 'language-python'
+
+    MDSeparator:
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        adaptive_height: True
+        padding: [5, 0, 0, 0]
+        spacing: '10dp'
+
+        MDLabel:
+            size_hint_y: None
+            height: self.texture_size[1]
+
+            text: 'Go to'
+            bold: True
+        OneLineIconListItem:
+            divider: None
+
+            text: 'Home'
+
+            on_release:
+                app.root.transition = FadeTransition()
+                app.root.current = 'main'
+
+                Clock.schedule_once(app.root.get_screen('sub').reset_list, 0.1)
+
+                # root.manager.transition = FadeTransition()
+                # root.manager.current = 'main'
+                # Clock.schedule_once(root.reset_list, 0.1)
+
+            IconLeftWidget:
+                theme_text_color: 'Custom'
+                text_color: app.theme_cls.primary_dark
+
+                icon: 'home'         
+
+
+<SubList>:
+    padding: [25, 10, 25, 10]
+    spacing: 20
+
+
+
+<SubCardListItem>:
+    size_hint_y: None
+    height: '140dp'
+
+    on_release:
+        root.toast_bridge()
+
+    BoxLayout:
+        pos: root.pos
+
+        orientation: "vertical"
+        padding: "10dp"
+        size_hint: 1, 1
+
+        canvas.before:
+            # Color:
+            #     rgba: app.theme_cls.primary_light
+            # Line:
+            #     width: 1.1
+            #     rounded_rectangle:
+            #         (self.x, self.y, self.width, self.height, root.r_value, root.r_value, root.r_value, root.r_value)
+
+            Color:
+                rgba: [1, 1, 1, 1]
+            RoundedRectangle:
+                pos: root.pos
+                size: root.size
+                radius: [root.r_value for i in range(4)]
+
+
+        MDLabel:
+            id: match
+
+            text: '*match percentage here*'
+            font_style: 'Overline'
+            theme_text_color: 'Custom'
+
+            size_hint_y: None
+            height: self.texture_size[1]
+
+            markup: True
+        
+        MDSeparator:
+            id: sep
+            height: '1dp'
+
+        MDLabel:
+            id: common
+            text: '*common name(s) here* \n'
+            font_style: 'H6'
+
+            size_hint_y: 0.6
+
+        BoxLayout:
+            size_hint_y: 0.4
+
+            orientation: 'vertical'
+            padding: 0
+            spacing: 0
+
+            MDLabel:
+                id: scientific
+
+                text: '*scientific name here*'
+                font_style: 'Subtitle2'
+                font_size: '14sp'
+                italic: True
+
+                size_hint: 1, None
+                size: self.texture_size
+                valign: 'bottom'                
+            
+            MDLabel:
+                id: flavor
+
+                text: '*flavor text here*'
+                font_style: 'Caption'
+                theme_text_color: 'Secondary'
+
+                size_hint: 1, None                
+                size: self.texture_size
+                valign: 'bottom'
+
+
+
+
+<DebugDialog>:
+    size_hint: 0.7, 0.5
