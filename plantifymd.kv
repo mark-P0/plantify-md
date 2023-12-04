@@ -11,11 +11,10 @@
 #: import MDBoxLayout kivymd.uix.boxlayout.MDBoxLayout
 
 
-
 Manager:
     MainScreen:
         name: 'main'
-    
+
     SubScreen:
         name: 'sub'
 
@@ -37,8 +36,7 @@ Manager:
         # Rectangle:
         #     pos: self.pos
         #     size: self.size
-        
-    
+
     BoxLayout:
         orientation: 'vertical'
 
@@ -56,7 +54,7 @@ Manager:
 
         MDLabel:
             size_hint_y: 0.1
-            
+
             text: 'Plantify'.upper()
             halign: 'center'
 
@@ -67,7 +65,7 @@ Manager:
 
         MDLabel:
             size_hint_y: 0.1
-            
+
             text: 'Tap the Camera icon below to start!'
             halign: 'center'
             valign: 'top'
@@ -76,10 +74,10 @@ Manager:
             font_size: dp(12)
             theme_text_color: "Custom"
             text_color: app.theme_cls.opposite_text_color
-        
+
         Widget:
             size_hint_y: 0.85
-    
+
     MDFloatingActionButton:
         id: open_camera
 
@@ -138,7 +136,7 @@ Manager:
             Animation(y=bottom_right_button.y * -2, duration=0.15).start(bottom_right_button)
 
             custom_backdrop_button.icon = 'chevron-up'
-                    
+
         on_close:
             Animation(y=relatables.pos[1] + 30, duration=0.15).start(relatables)
             # Animation(y=sub_image.pos[1] + 30, duration=0.15).start(sub_image)
@@ -150,7 +148,6 @@ Manager:
             Animation(y=bottom_right_button.y / -2, duration=0.2).start(bottom_right_button)
 
             custom_backdrop_button.icon = 'chevron-down'
-
 
         MDBackdropBackLayer:
             RelativeLayout:
@@ -175,7 +172,6 @@ Manager:
                 SubList:
                     id: sub_listview
 
-
     MDIconButton:
         id: custom_backdrop_button
         x: dp(10)
@@ -184,11 +180,11 @@ Manager:
         icon: 'chevron-down'
         theme_text_color: 'Custom'
         text_color: app.theme_cls.opposite_text_color
-                
+
         on_release:
             if backdrop._front_layer_open: backdrop.close()
             else: backdrop.open()
-            
+
     MDFloatingActionButton:
         id: bottom_right_button
 
@@ -203,7 +199,7 @@ Manager:
         text_color: app.theme_cls.opposite_text_color
 
         md_bg_color: [i if index != 3 else 0.75 for index, i in enumerate(app.theme_cls.accent_color)]
-        
+
         on_release:
             app.root.get_screen('main').camera_prompt()
 
@@ -229,7 +225,6 @@ Manager:
     padding: '15dp'
     spacing: '10dp'
 
-
     MDBoxLayout:
         orientation: 'vertical'
         adaptive_height: True
@@ -251,7 +246,7 @@ Manager:
                 group: "plant-type"
                 allow_no_selection: False
 
-                size_hint_x: None                
+                size_hint_x: None
                 size: "48dp", '48dp'
                 active: True
 
@@ -271,7 +266,7 @@ Manager:
                 group: "plant-type"
                 allow_no_selection: False
 
-                size_hint_x: None                
+                size_hint_x: None
                 size: "48dp", '48dp'
 
                 selected_color: app.theme_cls.accent_color
@@ -344,13 +339,12 @@ Manager:
                 theme_text_color: 'Custom'
                 text_color: app.theme_cls.primary_dark
 
-                icon: 'home'         
+                icon: 'home'
 
 
 <SubList>:
     padding: [25, 10, 25, 10]
     spacing: 20
-
 
 
 <SubCardListItem>:
@@ -382,7 +376,6 @@ Manager:
                 size: root.size
                 radius: [root.r_value for i in range(4)]
 
-
         MDLabel:
             id: match
 
@@ -394,7 +387,7 @@ Manager:
             height: self.texture_size[1]
 
             markup: True
-        
+
         MDSeparator:
             id: sep
             height: '1dp'
@@ -423,8 +416,8 @@ Manager:
 
                 size_hint: 1, None
                 size: self.texture_size
-                valign: 'bottom'                
-            
+                valign: 'bottom'
+
             MDLabel:
                 id: flavor
 
@@ -432,11 +425,9 @@ Manager:
                 font_style: 'Caption'
                 theme_text_color: 'Secondary'
 
-                size_hint: 1, None                
+                size_hint: 1, None
                 size: self.texture_size
                 valign: 'bottom'
-
-
 
 
 <DebugDialog>:
