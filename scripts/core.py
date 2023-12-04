@@ -1,6 +1,6 @@
 import imghdr
 import io
-import urllib.parse
+from urllib.parse import urlencode
 
 from kivy.core.image import Image as CoreImage
 from kivy.graphics import Color, RoundedRectangle
@@ -9,16 +9,47 @@ from PIL import Image
 from requests_toolbelt import MultipartEncoder
 
 
-class PlantifyCore:
-    SERVICE_URL = "https://my-api.plantnet.org/v2/identify/all"
-    API = "API_KEY_HERE"  # TODO Initialize API key
+def create_url(base: str, *paths: str, **queries: str) -> str:
+    """
+    https://stackoverflow.com/a/43934565
 
+    TODO Opt for a more robust approach? i.e. not string concatenations...
+    """
+
+    url = "/".join(part.strip("/") for part in (base, *paths))
+
+    if len(queries) > 0:
+        url += "?" + urlencode(queries)
+
+    return url
+
+
+API_URL = create_url(
+    "https://my-api.plantnet.org/v2/identify/all",
+    **{"api-key": "API_KEY_HERE"},  # TODO Initialize API key
+)
+
+
+class PlantifyCore:
     SAMPLE_RESPONSE = ""
     with open("samples/api-output.txt", "r") as f:
-        SAMPLE_RESPONSE = eval(f.read())  # noqa: E701
-    # with open('samples/api-output.txt', 'r') as f: SAMPLE_RESPONSE = eval(f.read())   # noqa: E701
+        SAMPLE_RESPONSE = eval(f.read())
 
     organ = "flower"
+
+    def get_images(self, image, debugging):
+        if debugging:
+            return (image[image.index("/") + 1 :], open(image, "rb"))
+
+        processing = Image.open(image)
+        processed = processing.resize(
+            [i // 2 for i in processing.size], resample=Image.ANTIALIAS
+        )
+
+        buffer = io.BytesIO()
+        processed.save(buffer, "JPEG")
+
+        return (image.split("_")[-1], buffer.getvalue())
 
     def get_response_for(
         self,
@@ -29,21 +60,7 @@ class PlantifyCore:
         func_error=None,
         func_progress=None,
     ):
-        url = f"{self.SERVICE_URL}?api-key={self.API}"
-        # url = 'https://httpbin.org/post'
-
-        if not debugging:
-            processing = Image.open(image)
-            processed = processing.resize(
-                [i // 2 for i in processing.size], resample=Image.ANTIALIAS
-            )
-
-            buffer = io.BytesIO()
-            processed.save(buffer, "JPEG")
-
-            images = (image.split("_")[-1], buffer.getvalue())
-        else:
-            images = (image[image.index("/") + 1 :], open(image, "rb"))
+        images = self.get_images(image, debugging)
 
         mp = MultipartEncoder(
             fields={
@@ -51,13 +68,12 @@ class PlantifyCore:
                 "images": images,
             }
         )
-
         UrlRequest(
-            url,
-            on_success=func_success,  # lambda *args: print(f'Success: {args}'),
-            on_failure=func_failure,  # lambda *args: print(f'Failure: {args}'),
-            on_error=func_error,  # lambda *args: print(f'Error: {args}'),
-            on_progress=func_progress,  # lambda *args: print(f'Progress: {args}'),
+            API_URL,
+            on_success=func_success,
+            on_failure=func_failure,
+            on_error=func_error,
+            on_progress=func_progress,
             req_body=mp,
             req_headers={"Content-Type": mp.content_type},
             verify=False,
@@ -65,25 +81,20 @@ class PlantifyCore:
 
 
 class ImageQuery:
-    BASE_URL = "https://www.googleapis.com/customsearch/v1?"
-    API = "API_KEY_HERE"  # TODO Initialize API key
-    CSE_ID = "CSE_ID_HERE"  # TODO Initialize CSE ID
-
     def __init__(self, widget):
         self.widget = widget
 
     def get_image_for(self, query):
-        parameters = {
-            "key": self.API,
-            "cx": self.CSE_ID,
-            "q": query,
-            "searchType": "image",
-        }
-
-        url_affix = urllib.parse.urlencode(parameters)
+        SEARCH_URL = create_url(
+            "https://www.googleapis.com/customsearch/v1?",
+            key="API_KEY_HERE",  # TODO Initialize API key
+            cx="CSE_ID_HERE",  # TODO Initialize CSE ID
+            q=query,
+            searchType="image",
+        )
 
         UrlRequest(
-            self.BASE_URL + url_affix,
+            SEARCH_URL,
             on_success=self.success,
             on_failure=self.failure,
             on_error=self.error,

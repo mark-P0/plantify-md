@@ -25,31 +25,29 @@ class CameraAndroid:
         self.on_complete = on_complete
 
         camera_intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        context = self.currentActivity.getApplicationContext()
 
         photo_file = None
-        if (
-            camera_intent.resolveActivity(
-                self.currentActivity.getApplicationContext().getPackageManager()
-            )
-            is not None
-        ):
-            photo_file = self._create_image_file()
+        activity = camera_intent.resolveActivity(context.getPackageManager())
+        if activity is None:
+            return
 
-            if photo_file is not None:
-                photo_uri = FileProvider.getUriForFile(
-                    self.currentActivity.getApplicationContext(),
-                    self.currentActivity.getApplicationContext().getPackageName(),
-                    photo_file,
-                )
+        photo_file = self._create_image_file()
+        if photo_file is None:
+            return
 
-                activity.bind(on_activity_result=self.on_activity_result)
+        photo_uri = FileProvider.getUriForFile(
+            context, context.getPackageName(), photo_file
+        )
 
-                parcelable = cast("android.os.Parcelable", photo_uri)
-                camera_intent.putExtra(MediaStore.EXTRA_OUTPUT, parcelable)
+        activity.bind(on_activity_result=self.on_activity_result)
 
-                self.currentActivity.startActivityForResult(
-                    camera_intent, self.CAMERA_REQUEST_CODE
-                )
+        parcelable = cast("android.os.Parcelable", photo_uri)
+        camera_intent.putExtra(MediaStore.EXTRA_OUTPUT, parcelable)
+
+        self.currentActivity.startActivityForResult(
+            camera_intent, self.CAMERA_REQUEST_CODE
+        )
 
     def on_activity_result(self, request_code, result_code, intent):
         if request_code == self.CAMERA_REQUEST_CODE:
