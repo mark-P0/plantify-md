@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "charliermarsh.ruff",
-        "monk3ydev.kvlang"
+        "monk3ydev.kvlang",
+        "streetsidesoftware.code-spell-checker"
     ]
 }
