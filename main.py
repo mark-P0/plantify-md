@@ -47,7 +47,7 @@ class MainScreen(Screen):
             Clock.schedule_once(self.runtime_permissions, 0.5)
         Clock.schedule_once(self.deferred, 1)
 
-    def deferred(self, *args):
+    def deferred(self, *_):
         self.button_taptarget = MDTapTargetView(
             widget=self.camera_button,
             title_text="Welcome to Plantify!",
@@ -59,9 +59,9 @@ class MainScreen(Screen):
 
         self.button_taptarget.start()
 
-        Clock.schedule_once(lambda *args: self.button_taptarget.stop(), 5)
+        Clock.schedule_once(lambda *_: self.button_taptarget.stop(), 5)
 
-    def runtime_permissions(self, *args):
+    def runtime_permissions(self, *_):
         from android.permissions import Permission, request_permissions
 
         request_permissions(
@@ -83,7 +83,7 @@ class MainScreen(Screen):
         if platform == "android":
             CameraAndroid(self.image_name).take_picture(
                 on_complete=lambda *args: Clock.schedule_once(
-                    lambda *args_: self.camera_callback(*args), 3
+                    lambda *_: self.camera_callback(*args), 3
                 )
             )
 
@@ -121,7 +121,7 @@ class SubScreen(Screen):
     ##
     ##        Clock.schedule_once(self.deferred, 1)
 
-    def deferred(self, *args):
+    def deferred(self, *_):
         self.backdrop_taptarget = MDTapTargetView(
             widget=self.backdrop_button,
             title_text="Results will be displayed in this screen",
@@ -172,13 +172,13 @@ class SubScreen(Screen):
                 image=self.captured_image.source,
                 debugging=will_debug,
                 func_success=lambda *args: Clock.schedule_once(
-                    lambda *args_: self.if_success(*args), delay
+                    lambda *_: self.if_success(*args), delay
                 ),
                 func_failure=lambda *args: Clock.schedule_once(
-                    lambda *args_: self.if_failure(*args), delay
+                    lambda *_: self.if_failure(*args), delay
                 ),
                 func_error=lambda *args: Clock.schedule_once(
-                    lambda *args_: self.if_error(*args), delay
+                    lambda *_: self.if_error(*args), delay
                 ),
                 func_progress=self.if_progress,
             )
@@ -232,7 +232,7 @@ class SubScreen(Screen):
 
         self.loader.active = False
 
-    def if_progress(self, *args):
+    def if_progress(self, *_):
         print("On progress. . .")
 
     def change_plant_type(self, type_):
@@ -244,7 +244,7 @@ class SubScreen(Screen):
             text=f'Organ type set to "{self.api.organ}"\nThis probably does not work lol'
         ).show()
 
-    def reset_list(self, *args):
+    def reset_list(self, *_):
         self.container_list.clear_widgets()
         self.backdrop.header_text = "Waiting for response. . ."
 
